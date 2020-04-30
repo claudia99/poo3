@@ -1,0 +1,257 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+class locuinta
+{
+protected:
+    string numeclient;
+    double supraf;
+    double discount;
+public:
+    locuinta(string nume="",double s=0,double di=0)
+    {
+        numeclient=nume;
+        supraf=s;
+        discount=di;
+
+    }
+    ~locuinta()
+{
+
+}
+    virtual void citire(istream& in)
+    {
+        cout<<"Introduceti numele clientului: ";
+        getline(in,numeclient);
+        cout<<endl<<"Introduceti suprafata locuintei: ";
+        in>>supraf;
+        int ok=0;
+        while(ok==0)
+        {cout<<endl<<"Introduceti discountul(0-10%): ";
+        in>>discount;
+        if(discount<0||discount>10)
+            cout<<"Discount incorect";
+        else ok=1;}
+
+    }
+    virtual void afisare(ostream& out)
+    {
+        out<<endl<<"Nume client: "<<numeclient<<endl;
+        out<<"Suprafata locuintei: "<<supraf<<endl;
+        out<<"Discount: "<<discount<<endl;
+
+    }
+    friend istream& operator>>(istream&in, locuinta& l)
+    {
+        l.citire(in);
+        return in;
+    }
+    friend ostream& operator<<(ostream& out,locuinta& l)
+    {
+        l.afisare(out);
+        return out;
+    }
+    locuinta& operator=(locuinta& l)
+    {
+        this->numeclient=l.numeclient;
+        this->discount=l.discount;
+        this->supraf=l.supraf;
+        return *this;
+    }
+   virtual double chirie()
+   {
+
+   }
+  // virtual double chirie()=0;
+};
+class apartament: public locuinta
+{
+protected:
+    int etaj;
+    double pret;
+public:
+    apartament(string nume="",double sup=0,double d=0,int e=0, double pr=0):locuinta(nume,sup,d)
+    {
+        etaj=e;
+        pret=pr;
+    }
+    ~apartament()
+    {
+
+    }
+    void citire(istream& in)
+    {
+        locuinta::citire(in);
+        int ok=0;
+        while(ok==0)
+        {cout<<endl<<"Introduceti etajul: ";
+        in>>etaj;
+        if(etaj<0|| etaj>10)
+            cout<<"Etaj incorect"<<endl;
+            else ok=1;}
+        cout<<endl<<"Introduceti pretul pe metru patrat: ";
+        in>>pret;
+
+    }
+    void afisare(ostream& out)
+    {
+        locuinta::afisare(out);
+        out<<"Etaj: "<<etaj;
+        out<<endl<<"Pret pe metru patrat: "<<pret;
+        out<<endl<<"Chiria pentru apartament: "<<chirie(*this);
+    }
+    friend istream& operator>>(istream&in, apartament& l)
+    {
+        l.citire(in);
+        return in;
+    }
+    friend ostream& operator<<(ostream& out,apartament& l)
+    {
+        l.afisare(out);
+        return out;
+    }
+    apartament& operator=(apartament& a)
+    {
+        this->locuinta::operator=(a);
+        this->etaj=a.etaj;
+        this->discount=a.discount;
+        return *this;
+    }
+    double chirie(apartament &a)
+    {
+        double aux=a.pret*a.supraf;
+        if(a.discount!=0)
+        aux=(aux*a.discount)/100;
+        return aux;
+    }
+};
+class casa: public locuinta
+{
+protected:
+    double curte;
+    int nretaje;
+    double pret;
+    vector <double> etaj;
+public:
+    casa(string nume="",double sup=0,double d=0,double c=0,int nr=0,vector <double> et={}):locuinta(nume,sup,d)
+    {
+        curte=c;
+        nretaje=nr;
+        etaj=et;
+    }
+    ~casa()
+    {
+
+    }
+    casa& operator=(casa& c)
+    {
+        this->locuinta::operator=(c);
+        this->curte=c.curte;
+        this->nretaje=c.nretaje;
+        this->etaj=c.etaj;
+        return *this;
+    }
+    void citire(istream& in)
+    {
+        locuinta::citire(in);
+        cout<<endl<<"Introduceti suprafata curtii: ";
+        in>>curte;
+        cout<<endl<<"Introduceti cate etaje are casa: (0= parter) ";
+        in>>nretaje;
+        double aux;
+        if(nretaje==0)
+            {cout<<endl<<"Etajul 0 are suprafata: ";
+            in>>aux;
+            etaj.push_back(aux);
+            cout<<endl;
+            }
+        else
+        {cout<<endl;for(int i=0;i<=nretaje;i++)
+        {
+            ///0 etaje = doar parter
+            /// sau 1 etaj = doar parter
+            ///???
+            cout<<"Etajul "<<i<<" are suprafata: ";
+            in>>aux;
+            etaj.push_back(aux);
+            cout<<endl;
+        }
+        }
+        cout<<"Introduceti pretul pentru metrul patrat de curte: ";
+        in>>pret;
+
+    }
+    void afisare(ostream& out)
+    {
+        locuinta::afisare(out);
+        out<<"Suprafata curtii: "<<curte<<endl<<"Numar de etaje: "<<nretaje<<endl;
+        if(nretaje==0)
+            cout<<"Etajul 0: "<<etaj[0]<<endl;
+        else
+        {for(int i=0;i<=nretaje;i++)
+            {cout<<"Etajul "<<i<<": "<<etaj[i];
+             cout<<endl;}
+        }
+        cout<<"Chiria pentru casa: "<<chirie(*this);
+
+    }
+     friend istream& operator>>(istream&in, casa& l)
+    {
+        l.citire(in);
+        return in;
+    }
+    friend ostream& operator<<(ostream& out,casa& l)
+    {
+        l.afisare(out);
+        return out;
+    }
+    double chirie(casa& c)
+    {
+        double aux=0;
+        aux=pret*curte;
+        return aux;
+    }
+};
+void tip(locuinta*&l, int i)
+{
+    cout<<endl<<"Introduceti tipul de locuinta(a/c): ";
+    string aux;
+    cin>>aux;
+    if(aux=="c")
+    {
+        l=new casa;
+
+        cin.get();
+        cin>>*l;
+    }
+    else if(aux=="a")
+    {
+        l=new apartament;
+        cin.get();
+        cin>>*l;
+    }
+    else cout<<"Caracter invalid";
+}
+int main()
+{
+//    locuinta **l;
+//    int n;
+//    cout<<"Introduceti numarul de locuinte: ";
+//    cin>>n;
+//    l=new locuinta*[n];
+//    for(int i=1;i<=n;i++)
+//    {cout<<endl;tip(l[i],i);}
+//
+//    for(int i=1;i<=n;i++)
+//        cout<<*l[i];
+
+    locuinta *l=new casa;
+    //apartament *m;
+    apartament *m;
+    cin>>*l;
+
+    //delete l;
+    cout<<*l;
+    return 0;
+}
+
