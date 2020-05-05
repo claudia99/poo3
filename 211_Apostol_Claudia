@@ -1,19 +1,53 @@
 #include <iostream>
 #include <vector>
+#include <stdlib.h>
+#include <typeinfo>
+#include <utility>
+#include <bits/stdc++.h>
 using namespace std;
+
 class locuinta
 {
 protected:
     string numeclient;
     double supraf;
     double discount;
+    static int nrloc;
 public:
+    static void locuinte()
+    {
+        cout<<"S-au creat "<<nrloc<<" locuinte"<<endl;
+    }
+    int ret_nrloc()
+    {
+        return nrloc;
+    }
     locuinta(string nume="",double s=0,double di=0)
     {
         numeclient=nume;
+    try
+    {
+        if (s<0)
+            throw s;
+    }
+    catch (double x)
+    {
+        cout<<"Eroare in constructor, suprafata nu poate fi negativa.\n";
+        exit(EXIT_FAILURE);
+    }
         supraf=s;
+     try
+    {
+        if (di<0||di>10)
+            throw di;
+    }
+    catch (double x)
+    {
+        cout<<"Eroare in constructor, disconutul trebuie sa fie intre 0-10%.\n";
+        exit(EXIT_FAILURE);
+    }
         discount=di;
-
+        nrloc++;
     }
     ~locuinta()
 {
@@ -24,7 +58,20 @@ public:
         cout<<"Introduceti numele clientului: ";
         getline(in,numeclient);
         cout<<endl<<"Introduceti suprafata locuintei: ";
-        in>>supraf;
+        double s;
+        in>>s;
+        try
+    {
+        if (s<0)
+            throw s;
+    }
+    catch (double x)
+    {
+        cout<<"Suprafata nu poate fi negativa.\n";
+        exit(EXIT_FAILURE);
+    }
+        supraf=s;
+
         int ok=0;
         while(ok==0)
         {cout<<endl<<"Introduceti discountul(0-10%): ";
@@ -58,12 +105,20 @@ public:
         this->supraf=l.supraf;
         return *this;
     }
+    locuinta( locuinta* const& l)
+    {
+         numeclient=l->numeclient;
+         discount=l->discount;
+         supraf=l->supraf;
+         nrloc++;
+    }
    virtual double chirie()
    {
 
    }
   // virtual double chirie()=0;
 };
+int locuinta::nrloc;
 class apartament: public locuinta
 {
 protected:
@@ -232,6 +287,47 @@ void tip(locuinta*&l, int i)
     }
     else cout<<"Caracter invalid";
 }
+template <class T>
+class gestiune
+{
+    //set<pair<locuinta,string>> s;
+    T *vect;
+    int nr;
+public:
+    gestiune(T *v,int n)
+    {
+        nr=n;
+        if(n>0)
+        {vect=new T[n];
+        for(int i=0;i<n;i++)
+            vect[i]=v[i];
+        }
+    }
+    gestiune(gestiune &g)
+    {
+         nr=g.n;
+        if(nr>0)
+        {vect=new T[nr];
+        for(int i=0;i<nr;i++)
+            vect[i]=g.v[i];
+        }
+    }
+    ~gestiune()
+    {
+        delete []vect;
+    }
+//    int operator+=(locuinta&l)
+//    {
+//        vect.push_back(l);
+//
+//        return ret_nrloc();
+//    }
+
+};
+typedef pair<locuinta, string> pairs;
+//typedef pair<int,int> per;
+typedef set<pairs> ss;
+
 int main()
 {
 //    locuinta **l;
@@ -245,13 +341,65 @@ int main()
 //    for(int i=1;i<=n;i++)
 //        cout<<*l[i];
 
-    locuinta *l=new casa;
-    //apartament *m;
-    apartament *m;
-    cin>>*l;
+//    locuinta *l=new locuinta;
+//    //apartament *m;
+//    apartament *m;
+//    cin>>*l;
+//
+//    //delete l;
+//    cout<<*l;
+//    string aux;
+//    getline(cin,aux);
+//    int j;
+//    cin>>j;
 
-    //delete l;
-    cout<<*l;
+//pair<int,int> p;
+
+//set <pairs> ss;
+
+//set<pairs> ::iterator c;
+string tip;
+vector <pairs> ciudi;
+locuinta *a;
+for(int i=0;i<3;i++)
+    {
+        cin>>tip;
+        if(tip=="apartament")
+            { a=new apartament;
+            string aux;
+                getline(cin,aux);
+                cin>>*a;
+                pairs x=make_pair(dynamic_cast<apartament*>(a),tip);
+                cout<<x.first<<endl<<x.second;
+               //ciudi.insert(x);
+                ciudi.push_back(x);
+
+            }
+            else
+            {
+                if(tip=="casa")
+                    {
+                        a=new casa;
+            string aux;
+                getline(cin,aux);
+                cin>>*a;
+                pairs x=make_pair(*a,tip);
+                cout<<x.first<<endl<<x.second;
+                ciudi.push_back(x);
+                    }
+                    else cout<<"Tip invalid. Introduceti apartament/casa"<<endl;
+            }
+    }
+    if(ciudi.empty()==1)
+    cout<<"un cur";
+    for(vector<pairs>::iterator it = ciudi.begin() ; it != ciudi.end(); ++it)
+            {
+               pairs i=*it;
+               apartament ap=(apartament&)i.first;
+               cout<<endl<<ap<<endl<<i.second<<endl;
+               cout<<typeid(i.first).name();
+            }
+
     return 0;
 }
 
