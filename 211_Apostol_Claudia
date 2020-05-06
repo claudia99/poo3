@@ -57,7 +57,7 @@ public:
     {
         cout<<"Introduceti numele clientului: ";
         getline(in,numeclient);
-        cout<<endl<<"Introduceti suprafata locuintei: ";
+        cout<<"Introduceti suprafata locuintei: ";
         double s;
         in>>s;
         try
@@ -74,7 +74,7 @@ public:
 
         int ok=0;
         while(ok==0)
-        {cout<<endl<<"Introduceti discountul(0-10%): ";
+        {cout<<"Introduceti discountul(0-10%): ";
         in>>discount;
         if(discount<0||discount>10)
             cout<<"Discount incorect";
@@ -105,7 +105,15 @@ public:
         this->supraf=l.supraf;
         return *this;
     }
-    locuinta( locuinta* const& l)
+//    locuinta( locuinta const& l)
+//    {   ///cout<<"Copy";
+//        if(this!=&l)
+//         {numeclient=l.numeclient;
+//         discount=l.discount;
+//         supraf=l.supraf;
+//         nrloc++;}
+//    }
+ locuinta( locuinta* const& l)
     {
          numeclient=l->numeclient;
          discount=l->discount;
@@ -116,7 +124,7 @@ public:
    {
 
    }
-  // virtual double chirie()=0;
+
 };
 int locuinta::nrloc;
 class apartament: public locuinta
@@ -139,12 +147,12 @@ public:
         locuinta::citire(in);
         int ok=0;
         while(ok==0)
-        {cout<<endl<<"Introduceti etajul: ";
+        {cout<<"Introduceti etajul: ";
         in>>etaj;
         if(etaj<0|| etaj>10)
             cout<<"Etaj incorect"<<endl;
             else ok=1;}
-        cout<<endl<<"Introduceti pretul pe metru patrat: ";
+        cout<<"Introduceti pretul pe metru patrat: ";
         in>>pret;
 
     }
@@ -169,14 +177,22 @@ public:
     {
         this->locuinta::operator=(a);
         this->etaj=a.etaj;
-        this->discount=a.discount;
+        this->pret=a.pret;
         return *this;
+    }
+    apartament(const apartament& a):locuinta(a)
+    {
+        ///cout<<"copy apartament";
+        if(this!=&a)
+        {etaj=a.etaj;
+        pret=a.pret;}
+
     }
     double chirie(apartament &a)
     {
         double aux=a.pret*a.supraf;
         if(a.discount!=0)
-        aux=(aux*a.discount)/100;
+        aux=aux-(aux*a.discount)/100;
         return aux;
     }
 };
@@ -198,39 +214,51 @@ public:
     {
 
     }
+    casa(const casa& c):locuinta(c)
+    {
+        if(this!=&c)
+        {cout<<"Copy casa";
+        curte=c.curte;
+        nretaje=c.nretaje;
+        pret=c.pret;
+        etaj=c.etaj;
+        }
+    }
     casa& operator=(casa& c)
     {
         this->locuinta::operator=(c);
         this->curte=c.curte;
         this->nretaje=c.nretaje;
+        this->pret=c.pret;
         this->etaj=c.etaj;
         return *this;
     }
     void citire(istream& in)
     {
         locuinta::citire(in);
-        cout<<endl<<"Introduceti suprafata curtii: ";
+        cout<<"Introduceti suprafata curtii: ";
         in>>curte;
-        cout<<endl<<"Introduceti cate etaje are casa: (0= parter) ";
+        cout<<"Introduceti cate etaje are casa: (0= parter) ";
         in>>nretaje;
         double aux;
-        if(nretaje==0)
-            {cout<<endl<<"Etajul 0 are suprafata: ";
-            in>>aux;
-            etaj.push_back(aux);
-            cout<<endl;
-            }
-        else
-        {cout<<endl;for(int i=0;i<=nretaje;i++)
+//        if(nretaje==0)
+//            {cout<<"Etajul 0 are suprafata: ";
+//            in>>aux;
+//            etaj.push_back(aux);
+//            cout<<endl;
+//            }
+//        else
+        for(int i=0;i<=nretaje;i++)
         {
             ///0 etaje = doar parter
             /// sau 1 etaj = doar parter
             ///???
+
             cout<<"Etajul "<<i<<" are suprafata: ";
             in>>aux;
             etaj.push_back(aux);
-            cout<<endl;
-        }
+
+
         }
         cout<<"Introduceti pretul pentru metrul patrat de curte: ";
         in>>pret;
@@ -240,13 +268,13 @@ public:
     {
         locuinta::afisare(out);
         out<<"Suprafata curtii: "<<curte<<endl<<"Numar de etaje: "<<nretaje<<endl;
-        if(nretaje==0)
-            cout<<"Etajul 0: "<<etaj[0]<<endl;
-        else
-        {for(int i=0;i<=nretaje;i++)
+//        if(nretaje==0)
+//            cout<<"Etajul 0: "<<etaj[0]<<endl;
+//        else
+        for(int i=0;i<=nretaje;i++)
             {cout<<"Etajul "<<i<<": "<<etaj[i];
              cout<<endl;}
-        }
+
         cout<<"Chiria pentru casa: "<<chirie(*this);
 
     }
@@ -263,7 +291,12 @@ public:
     double chirie(casa& c)
     {
         double aux=0;
-        aux=pret*curte;
+//        for(int i=0;i<=nretaje;i++)
+//            aux=aux+pret*etaj[i];
+        aux=aux+c.supraf*c.pret;
+        if(discount!=0)
+            aux=aux-(aux*discount)/100;
+        aux+=c.pret*c.curte;
         return aux;
     }
 };
@@ -294,7 +327,7 @@ class gestiune
     T *vect;
     int nr;
 public:
-    gestiune(T *v,int n)
+    gestiune(T *v={},int n=0)
     {
         nr=n;
         if(n>0)
@@ -316,6 +349,37 @@ public:
     {
         delete []vect;
     }
+    friend istream& operator>>(istream& in,gestiune <T> &g)
+    {
+        cout<<"Introduceti numarul de locuinte: ";
+
+        in>>g.nr;
+        cout<<endl;
+        g.vect=new T[g.nr];
+        for(int i=0;i<g.nr;i++)
+            {cout<<"Locuinta "<<i+1<<":"<<endl;
+                string buff;
+                getline(cin,buff);
+                in>>g.vect[i];
+                cout<<endl;
+
+            }
+            return in;
+    }
+    friend ostream& operator<<(ostream& out, gestiune<T> &g)
+    {
+            out<<"S-au vandut "<<g.nr<<" locuinte ";
+            for(int i=0;i<g.nr;i++)
+            {
+                out<<endl<<endl;
+                out<<i+1<<":";
+                out<<g.vect[i];
+
+            }
+            return out;
+
+
+    }
 //    int operator+=(locuinta&l)
 //    {
 //        vect.push_back(l);
@@ -325,9 +389,135 @@ public:
 
 };
 typedef pair<locuinta, string> pairs;
-//typedef pair<int,int> per;
-typedef set<pairs> ss;
 
+template<>class gestiune<casa>
+{
+    casa* c;
+    int nrcase;
+    double profit;
+public:
+    gestiune(casa* a=NULL,int nr=0)
+    {
+        nrcase=nr;
+        profit=0;
+        c=new casa[nrcase];
+        for(int i=0;i<nrcase;i++)
+            {c[i]=a[i];
+                profit+=c[i].chirie(c[i]);}
+
+    }
+    ~gestiune()
+    {
+        delete [] c;
+    }
+    gestiune(const gestiune &s)
+    {
+       /// cout<<"copy specializare";
+        nrcase=s.nrcase;
+        c=new casa[nrcase];
+        for(int i=0;i<nrcase;i++)
+            c[i]=s.c[i];
+    }
+    friend istream& operator>>(istream &in,gestiune<casa> &cg)
+    {
+        cout<<"Introduceti numarul de case: ";
+        in>>cg.nrcase;
+        cg.c=new casa[cg.nrcase];
+        for(int i=0;i<cg.nrcase;i++)
+        {
+            cout<<"Casa "<<i+1<<":"<<endl;
+            string buf;
+            getline(cin,buf);
+            in>>cg.c[i];
+            cg.profit+=cg.c[i].chirie(cg.c[i]);
+            cout<<endl;
+        }
+        return in;
+    }
+    friend ostream& operator<<(ostream& out,gestiune<casa> &cg)
+    {
+        out<<"Au fost vandute "<<cg.nrcase<<" case"<<endl;
+        out<<"Profitul agentiei este de: "<<cg.profit;
+        return out;
+
+    }
+
+};
+void menu_output()
+{
+    cout<<"Apostol Claudia grupa 211 - tema 9"<<endl;
+    cout<<endl<<"MENIU"<<endl;
+    cout<<"---------------------------------------"<<endl;
+    cout<<endl;
+    cout<<"1. Citirea a n locuinte"<<endl;
+    cout<<"2. Template -> locuinta"<<endl;
+    cout<<"3. Template -> apartament"<<endl;
+    cout<<"4. Template -> casa (specializare)"<<endl;
+    cout<<"5. "<<endl;
+    cout<<"0. Iesire"<<endl;
+}
+void menu()
+{
+    int option,nr,ok;
+    locuinta **l;
+    do
+    {
+        menu_output();
+        cout<<"Introduceti numarul actiunii: ";
+        cin>>option;
+        if(option>5||option<0)
+            cout<<"Selectie invalida"<<endl;
+        if(option==0)
+            cout<<"EXIT"<<endl;
+        if(option==1)
+        {
+             cout<<endl<<"Introduceti numarul de locuinte citite: ";
+                cin>>nr;
+            try
+            {
+                l=new locuinta*[nr];
+                cout<<endl;
+                for(int i=0; i<nr;i++ )
+                {
+                    cout<<i+1<<": ";
+                    tip(l[i],i);
+                    cout<<endl;
+                }
+            }
+            catch(bad_alloc var)
+            {
+                cout<<"bad alloc"<<endl;
+                exit(EXIT_FAILURE);
+            }
+            ok=1;
+            cout<<endl;
+            for(int i=0;i<nr;i++)
+                { cout<<i+1<<":"<<endl;cout<<*l[i]; cout<<endl;}
+        }
+        if(option==2)
+        {
+            gestiune<locuinta> x;
+            cin>>x;
+            cout<<x;
+        }
+        if(option==3)
+        {
+            gestiune <apartament>x;
+            cin>>x;
+            cout<<x;
+        }
+        if(option==4)
+        {
+            gestiune<casa> x;
+            cin>>x;
+            cout<<x;
+        }
+         system("pause");
+        system("cls");
+
+    }while(option!=0);
+
+}
 int main()
 {
 //    locuinta **l;
@@ -353,53 +543,57 @@ int main()
 //    int j;
 //    cin>>j;
 
-//pair<int,int> p;
+//string tip;
+//vector <pairs> ciudi;
+//locuinta *a;
+//for(int i=0;i<3;i++)
+//    {
+//        cin>>tip;
+//        if(tip=="apartament")
+//            { a=new apartament;
+//            string aux;
+//                getline(cin,aux);
+//                cin>>*a;
+//                pairs x=make_pair(dynamic_cast<apartament*>(a),tip);
+//                cout<<x.first<<endl<<x.second;
+//               //ciudi.insert(x);
+//                ciudi.push_back(x);
+//
+//            }
+//            else
+//            {
+//                if(tip=="casa")
+//                    {
+//                        a=new casa;
+//            string aux;
+//                getline(cin,aux);
+//                cin>>*a;
+//                pairs x=make_pair(*a,tip);
+//                cout<<x.first<<endl<<x.second;
+//                ciudi.push_back(x);
+//                    }
+//                    else cout<<"Tip invalid. Introduceti apartament/casa"<<endl;
+//            }
+//    }
+//    if(ciudi.empty()==1)
+//    cout<<"un cur";
+//    for(vector<pairs>::iterator it = ciudi.begin() ; it != ciudi.end(); ++it)
+//            {
+//               pairs i=*it;
+//               apartament ap=(apartament&)i.first;
+//               cout<<endl<<ap<<endl<<i.second<<endl;
+//               cout<<typeid(i.first).name();
+//            }
 
-//set <pairs> ss;
-
-//set<pairs> ::iterator c;
-string tip;
-vector <pairs> ciudi;
-locuinta *a;
-for(int i=0;i<3;i++)
-    {
-        cin>>tip;
-        if(tip=="apartament")
-            { a=new apartament;
-            string aux;
-                getline(cin,aux);
-                cin>>*a;
-                pairs x=make_pair(dynamic_cast<apartament*>(a),tip);
-                cout<<x.first<<endl<<x.second;
-               //ciudi.insert(x);
-                ciudi.push_back(x);
-
-            }
-            else
-            {
-                if(tip=="casa")
-                    {
-                        a=new casa;
-            string aux;
-                getline(cin,aux);
-                cin>>*a;
-                pairs x=make_pair(*a,tip);
-                cout<<x.first<<endl<<x.second;
-                ciudi.push_back(x);
-                    }
-                    else cout<<"Tip invalid. Introduceti apartament/casa"<<endl;
-            }
-    }
-    if(ciudi.empty()==1)
-    cout<<"un cur";
-    for(vector<pairs>::iterator it = ciudi.begin() ; it != ciudi.end(); ++it)
-            {
-               pairs i=*it;
-               apartament ap=(apartament&)i.first;
-               cout<<endl<<ap<<endl<<i.second<<endl;
-               cout<<typeid(i.first).name();
-            }
-
+    menu();
+    gestiune<apartament> x;
+    cin>>x;
+    cout<<x;
+//    casa *l=new casa;
+//    cin>>*l;
+//    casa m(*l);
+//    delete l;
+//    cout<<m;
     return 0;
 }
 
