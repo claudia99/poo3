@@ -461,10 +461,10 @@ template <class T>
 class gestiune
 {
     T *vect;
-    // vector <T> vect;
+    vector <T> ve;
     int nr;
     //vector< pair<locuinta, string> > myvector;
-    int index;
+    static int index;
 public:
     gestiune(T *v= {},int n=0)
     {
@@ -506,6 +506,7 @@ public:
             getline(cin,buff);
             in>>g.vect[i];
             cout<<endl;
+            g.ve.push_back(g.vect[i]);
 //                Vector.push_back(make_pair(g.vect[i],"buna"));
         }
 
@@ -513,7 +514,8 @@ public:
     }
     friend ostream& operator<<(ostream& out, gestiune<T> &g)
     {
-        out<<"S-au vandut "<<g.nr<<" locuinte ";
+        if(index==0)
+        {out<<"S-au vandut "<<g.nr<<" locuinte ";
         for(int i=0; i<g.nr; i++)
         {
             out<<endl<<endl;
@@ -521,26 +523,33 @@ public:
             out<<g.vect[i];
 
         }
+        }
+        else g.afis_ve(g);
+
         return out;
-
-
     }
-    /***  int operator+=(locuinta&l)
-    //    {
-    //        vect.push_back(l);
-    //
-    //        return ret_nrloc();
-    //    }
-    //T& operator+=(T& rhs) // compound assignment (does not need to be a member,
-    //  {                           // but often is, to modify the private members)
-    //    /* addition of rhs to *this takes place here */
-//    index++;
-//    cin>>rhs;
-//        vect.push_back(rhs);
-//    return rhs; // return the result by reference
-//  }
-
+ friend void operator +=(gestiune <T> &g1,gestiune &g)
+    {
+        //cin>>g;
+        g1.index=g1.nr;
+        vector <T> aux;
+        for(int i=0; i<g.nr; i++)
+        {
+            g1.ve.push_back(g.vect[i]);
+            g1.index++;
+        }
+    }
+    static void  get_index()
+    {
+        cout<<"Indexul este: "<<index<<endl;
+    }
+    void afis_ve(gestiune &g)
+    {
+        for(int i=0;i<g.ve.size();i++)
+            cout<<g.ve[i]<<endl;
+    }
 };
+template <class T> int gestiune <T> ::index=0;
 
 template<>class gestiune<casa>
 {
@@ -661,6 +670,7 @@ void menu()
             //x.afis_vect(x);
 
             cout<<x;
+            cout<<endl;
             //delete &x;
         }
         if(option==3)
@@ -668,6 +678,7 @@ void menu()
             gestiune <apartament>x;
             cin>>x;
             cout<<x;
+            cout<<endl;
 
         }
         if(option==4)
@@ -675,6 +686,7 @@ void menu()
             gestiune<casa> x;
             cin>>x;
             cout<<x;
+            cout<<endl;
         }
         if(option==5)
         {
@@ -724,15 +736,15 @@ void menu()
         }
         if(option==6)
         {
-//            gestiune <apartament> x;
-//            cin>>x;
-//            x.get_index();
-//            gestiune<apartament> ap;
-//            cin>>ap;
-//            x+=ap;
-//            x.get_index();
-//            cout<<x;
-//            cout<<endl;
+            gestiune <apartament> x;
+            cin>>x;
+            x.get_index();
+            gestiune<apartament> ap;
+            cin>>ap;
+            x+=ap;
+            x.get_index();
+            cout<<x;
+            cout<<endl;
         }
         if(option==7)
         {
