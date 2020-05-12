@@ -111,11 +111,11 @@ public:
         this->supraf=l.supraf;
         return *this;
     }
-    locuinta( locuinta* const& l)
+    locuinta(const locuinta& l)
     {
-        numeclient=l->numeclient;
-        discount=l->discount;
-        supraf=l->supraf;
+        numeclient=l.numeclient;
+        discount=l.discount;
+        supraf=l.supraf;
         nrloc++;
     }
     virtual double chirie()
@@ -124,7 +124,6 @@ public:
 
 };
 int locuinta::nrloc;
-//typedef pair<locuinta, string> pairs;
 
 class apartament: public locuinta
 {
@@ -134,7 +133,7 @@ protected:
 public:
     apartament(string nume="",double sup=0,double d=0,int e=0, double pr=0):locuinta(nume,sup,d)
     {
-         try
+        try
         {
             if (e<0||e>10)
                 throw e;
@@ -145,7 +144,7 @@ public:
             exit(EXIT_FAILURE);
         }
         etaj=e;
-         try
+        try
         {
             if (pr<0)
                 throw pr;
@@ -167,10 +166,10 @@ public:
     {
         locuinta::citire(in);
 
-            cout<<"Introduceti etajul: ";
-            int et;
-            in>>et;
-              try
+        cout<<"Introduceti etajul: ";
+        int et;
+        in>>et;
+        try
         {
             if (et<0||et>10)
                 throw et;
@@ -185,7 +184,7 @@ public:
         cout<<"Introduceti pretul pe metru patrat: ";
         double pr;
         in>>pr;
-          try
+        try
         {
             if (pr<0)
                 throw pr;
@@ -198,7 +197,7 @@ public:
         pret=pr;
 
     }
-    void afisare(ostream& out)
+    void afisare (ostream& out)
     {
         locuinta::afisare(out);
         out<<"Etaj: "<<etaj;
@@ -232,7 +231,7 @@ public:
         }
 
     }
-    double chirie(apartament &a)
+    double chirie(apartament &a) const
     {
         double aux=a.pret*a.supraf;
         if(a.discount!=0)
@@ -248,173 +247,115 @@ protected:
     double pret;
     vector <double> etaj;
 public:
-    casa(string nume="",double sup=0,double d=0,double c=0,int nr=0,double pr=0,vector <double> et= {}):locuinta(nume,sup,d)
+    casa(string nume="",double sup=0,double d=0,double c=0,int nr=0,vector <double> et={}):locuinta(nume,sup,d)
     {
-          try
-        {
-            if (c<0)
-                throw c;
+        try{
+                if(c<0)
+                    throw c;
         }
-        catch (double x)
-        {
+        catch(double x) {
             cout<<"Eroare in constructor, suprafata curtii trebuie sa fie pozitiva"<<endl;
             exit(EXIT_FAILURE);
-        }
+             }
         curte=c;
-         try
-        {
-            if (pr<0)
-                throw pr;
+        try{
+                if(nr<0|| nr>10)
+                    throw c;
         }
-        catch (double x)
-        {
-            cout<<"Eroare in constructor,pretul trebuie sa fie pozitiv"<<endl;
-            exit(EXIT_FAILURE);
-        }
-
-        pret=pr;
-          try
-        {
-            if (nr<0||nr>10)
-                throw nr;
-        }
-        catch (int x)
-        {
+        catch(double x) {
             cout<<"Eroare in constructor, numarul de etaje trebuie sa fie intre 0-10"<<endl;
             exit(EXIT_FAILURE);
-        }
+             }
         nretaje=nr;
-        if(nretaje!=0)
-            for(int i=0;i<nretaje;i++)
-        {
-            double aux;
-        try
-        {
-            if (aux<0)
-                throw aux;
-        }
-        catch (double x)
-        {
-            cout<<"Eroare in constructor,suprafata unui etaj trebuie sa fie pozitiva"<<endl;
-            exit(EXIT_FAILURE);
-        }
-        etaj[i]=et[i];
-        }
-
+        etaj=et;
     }
     ~casa()
     {
-        delete &etaj;
+
     }
-    casa(const casa& c):locuinta(c)
+    casa(const casa &c):locuinta(c)
     {
-        if(this!=&c)
-        {
-            //cout<<"Copy casa";
-            curte=c.curte;
-            nretaje=c.nretaje;
-            pret=c.pret;
-            etaj=c.etaj;
-        }
+        curte=c.curte;
+        nretaje=c.nretaje;
+        etaj=c.etaj;
+        pret=c.pret;
     }
     casa& operator=(casa& c)
     {
         this->locuinta::operator=(c);
         this->curte=c.curte;
         this->nretaje=c.nretaje;
-        this->pret=c.pret;
         this->etaj=c.etaj;
+        this->pret=c.pret;
         return *this;
     }
     void citire(istream& in)
     {
         locuinta::citire(in);
         cout<<"Introduceti suprafata curtii: ";
-        double c;
-        in>>c;
-         try
+        double curte1,nretaje1;
+        in>>curte1;
+        try
         {
-            if (c<0)
-                throw c;
+            if(curte1<0)
+                throw curte1;
         }
-        catch (double x)
+        catch(double x)
         {
-            cout<<"Suprafata curtii trebuie sa fie strict pozitiva"<<endl;
+            cout<<"Suprafata curtii trebuie sa fie pozitiva"<<endl;
             exit(EXIT_FAILURE);
         }
-        curte=c;
+        curte=curte1;
         cout<<"Introduceti cate etaje are casa: (0= parter) ";
-        int nr;
-        in>>nr;
-         try
-        {
-            if (nr<0||nr>10)
-                throw nr;
+        in>>nretaje1;
+        try{
+            if(nretaje1<0||nretaje1>10)
+                throw nretaje1;
         }
-        catch (int x)
+        catch(double x)
         {
             cout<<"Numarul de etaje trebuie sa fie intre 0-10"<<endl;
             exit(EXIT_FAILURE);
         }
-        nretaje=nr;
+
+        nretaje=nretaje1;
         double aux;
-        for(int i=0; i<=nretaje; i++)
+        if(nretaje==0)
+            {cout<<"Etajul 0 are suprafata: ";
+            in>>aux;
+            etaj.push_back(aux);
+            }
+        else
+        {for(int i=0;i<=nretaje;i++)
         {
             ///0 etaje = doar parter
             /// sau 1 etaj = doar parter
             ///???
-
             cout<<"Etajul "<<i<<" are suprafata: ";
             in>>aux;
-             try
-        {
-            if (aux<=0)
-                throw aux;
-        }
-        catch (double x)
-        {
-            cout<<"Suprafata unui etaj trebuie sa fie strict pozitiva"<<endl;
-            exit(EXIT_FAILURE);
-        }
-
             etaj.push_back(aux);
 
-
+        }
         }
         cout<<"Introduceti pretul pentru metrul patrat de curte: ";
-        double pr;
-        in>>pr;
-         try
-        {
-            if (pr<0)
-                throw pr;
-        }
-        catch (double x)
-        {
-            cout<<"Pretul trebuie sa fie strict pozitiv"<<endl;
-            exit(EXIT_FAILURE);
-        }
-
-        pret=pr;
+        in>>pret;
 
     }
     void afisare(ostream& out)
     {
         locuinta::afisare(out);
         out<<"Suprafata curtii: "<<curte<<endl<<"Numar de etaje: "<<nretaje<<endl;
-//        if(nretaje==0)
-//            cout<<"Etajul 0: "<<etaj[0]<<endl;
-//        else
-        for(int i=0; i<=nretaje; i++)
-        {
-            cout<<"Etajul "<<i<<": "<<etaj[i];
-            cout<<endl;
+        if(nretaje==0)
+            cout<<"Etajul 0: "<<etaj[0]<<endl;
+        else
+        {for(int i=0;i<=nretaje;i++)
+            {cout<<"Etajul "<<i<<": "<<etaj[i];
+             cout<<endl;}
         }
-
         cout<<"Chiria pentru casa: "<<chirie(*this);
 
     }
-    friend istream& operator>>(istream&in, casa& l)
+     friend istream& operator>>(istream&in, casa& l)
     {
         l.citire(in);
         return in;
@@ -424,7 +365,7 @@ public:
         l.afisare(out);
         return out;
     }
-    double chirie(casa& c)
+    double chirie(casa& c) const
     {
         double aux=0;
 //        for(int i=0;i<=nretaje;i++)
@@ -441,21 +382,34 @@ void tip(locuinta*&l, int i)
     cout<<endl<<"Introduceti tipul de locuinta(a/c): ";
     string aux;
     cin>>aux;
-    if(aux=="c")
+    try
     {
-        l=new casa;
+        if(aux=="c")
+        {
+            l=new casa;
 
-        cin.get();
-        cin>>*l;
+            cin.get();
+            cin>>*l;
+        }
+        else if(aux=="a")
+        {
+            l=new apartament;
+            cin.get();
+            cin>>*l;
+        }
+        else
+            throw 10;
     }
-    else if(aux=="a")
+    catch (bad_alloc var)
     {
-        l=new apartament;
-        cin.get();
-        cin>>*l;
+        cout << "Allocation Failure\n";
+        exit(EXIT_FAILURE);
     }
-    else
-        cout<<"Caracter invalid";
+    catch(int j)
+    {
+        cout<<"Nu ati introdus un tip valid ";
+        exit(EXIT_FAILURE);
+    }
 }
 template <class T>
 class gestiune
@@ -463,7 +417,6 @@ class gestiune
     T *vect;
     vector <T> ve;
     int nr;
-    //vector< pair<locuinta, string> > myvector;
     static int index;
 public:
     gestiune(T *v= {},int n=0)
@@ -481,11 +434,12 @@ public:
     gestiune(gestiune &g)
     {
         nr=g.n;
+        vect=new T[nr];
         if(nr>0)
         {
-            vect=new T[nr];
+
             for(int i=0; i<nr; i++)
-                vect[i]=g.v[i];
+                {vect[i]=g.v[i]; ve.push_back(g.v[i]);}
         }
     }
     ~gestiune()
@@ -503,7 +457,7 @@ public:
         {
             cout<<"Locuinta "<<i+1<<":"<<endl;
             string buff;
-            getline(cin,buff);
+            getline(in,buff);
             in>>g.vect[i];
             cout<<endl;
             g.ve.push_back(g.vect[i]);
@@ -515,24 +469,31 @@ public:
     friend ostream& operator<<(ostream& out, gestiune<T> &g)
     {
         if(index==0)
-        {out<<"S-au vandut "<<g.nr<<" locuinte ";
-        for(int i=0; i<g.nr; i++)
         {
-            out<<endl<<endl;
-            out<<i+1<<":";
-            out<<g.vect[i];
+            out<<"S-au vandut "<<g.nr<<" locuinte de tip ";
 
+           if(typeid(g.vect[0])==typeid(apartament))
+            out<<"apartament ";
+            else if(typeid(g.vect[0])==typeid(locuinta))
+                out<<"locuinta ";
+            for(int i=0; i<g.nr; i++)
+            {
+out<<endl<<endl;
+                out<<i+1<<":";
+                out<<g.vect[i];
+
+            }
         }
-        }
-        else g.afis_ve(g);
+        else
+            g.afis_ve(g);
 
         return out;
     }
- friend void operator +=(gestiune <T> &g1,gestiune &g)
+    friend void operator +=(gestiune <T> &g1,gestiune &g)
     {
         //cin>>g;
         g1.index=g1.nr;
-        vector <T> aux;
+        //vector <T> aux;
         for(int i=0; i<g.nr; i++)
         {
             g1.ve.push_back(g.vect[i]);
@@ -545,7 +506,7 @@ public:
     }
     void afis_ve(gestiune &g)
     {
-        for(int i=0;i<g.ve.size();i++)
+        for(int i=0; i<g.ve.size(); i++)
             cout<<g.ve[i]<<endl;
     }
 };
@@ -553,7 +514,8 @@ template <class T> int gestiune <T> ::index=0;
 
 template<>class gestiune<casa>
 {
-    casa* c;
+    casa* cas;
+   // vector <casa> pls;
     int nrcase;
     double profit;
 public:
@@ -561,38 +523,47 @@ public:
     {
         nrcase=nr;
         profit=0;
-        c=new casa[nrcase];
+       // pls=p;
+        cas=new casa[nrcase];
+        if(nrcase>0)
         for(int i=0; i<nrcase; i++)
         {
-            c[i]=a[i];
-            profit+=c[i].chirie(c[i]);
+            cas[i]=a[i];
+           // pls.push_back(a[i]);
+            profit+=cas[i].chirie(cas[i]);
         }
 
     }
+        void afis_case()
+        {
+            for(int i=0;i<nrcase;i++)
+            cout<<cas[i]<<endl;
+        }
     ~gestiune()
     {
-        delete [] c;
+        delete [] cas;
     }
     gestiune(const gestiune &s)
     {
         /// cout<<"copy specializare";
         nrcase=s.nrcase;
-        c=new casa[nrcase];
+        cas=new casa[nrcase];
         for(int i=0; i<nrcase; i++)
-            c[i]=s.c[i];
+            cas[i]=s.cas[i];
     }
     friend istream& operator>>(istream &in,gestiune<casa> &cg)
     {
         cout<<"Introduceti numarul de case: ";
         in>>cg.nrcase;
-        cg.c=new casa[cg.nrcase];
+        cg.cas=new casa[cg.nrcase];
         for(int i=0; i<cg.nrcase; i++)
         {
             cout<<"Casa "<<i+1<<":"<<endl;
             string buf;
-            getline(cin,buf);
-            in>>cg.c[i];
-            cg.profit+=cg.c[i].chirie(cg.c[i]);
+            getline(in,buf);
+            in>>cg.cas[i];
+            //cg.pls.push_back(cg.cas[i]);
+            cg.profit+=cg.cas[i].chirie(cg.cas[i]);
             cout<<endl;
         }
         return in;
@@ -600,11 +571,15 @@ public:
     friend ostream& operator<<(ostream& out,gestiune<casa> &cg)
     {
         out<<"Au fost vandute "<<cg.nrcase<<" case"<<endl;
-        out<<"Profitul agentiei este de: "<<cg.profit;
+//        for(int i=0;i<cg.nrcase;i++)
+//            out<<cg.cas[i]<<endl;
+        out<<"Profitul agentiei este de: "<<cg.get_profit();
+       // cout<<"GATA";
         return out;
-
+            }
+    double get_profit()const{
+    return profit;
     }
-
 };
 void menu_output()
 {
@@ -613,11 +588,11 @@ void menu_output()
     cout<<"---------------------------------------"<<endl;
     cout<<endl;
     cout<<"1. Citirea a n locuinte folosind upcast si late-binding"<<endl;
-    cout<<"2. Template -> locuinta"<<endl;
+    cout<<"2. Template -> locuinta"<<endl; /// nu e deloc practic , dar l-am facut ca sa fie 2 posibilitati la template
     cout<<"3. Template -> apartament"<<endl;
     cout<<"4. Template -> casa (specializare)"<<endl;
     cout<<"5. Citirea a n locuinte cu ajutorul structurii de date vector <pair <locuinta,tip> > "<<endl;
-    cout<<"6."<<endl;
+    cout<<"6. Adaugare apartamente in gestiune (prin supraincarcare +=) "<<endl;
     cout<<"7. Contorizare locuinte "<<endl;
     cout<<"0. Iesire"<<endl;
 }
@@ -638,7 +613,8 @@ void menu()
         {
             cout<<endl<<"Introduceti numarul de locuinte citite: ";
             cin>>nr1;
-            try
+            if(nr1>=0)
+            {try
             {
                 l=new locuinta*[nr1];
                 cout<<endl;
@@ -656,19 +632,22 @@ void menu()
             }
             ok=1;
             cout<<endl;
+             cout<<"____________________________________________________"<<endl<<endl;
             for(int i=0; i<nr1; i++)
             {
-                cout<<i+1<<":"<<endl;
+                cout<<i+1<<":";
+
                 cout<<*l[i];
-                cout<<endl;
+                cout<<endl<<endl;
             }
+            } else {cout<<"Numarul introdus trebuie sa fie pozitiv"<<endl; exit(EXIT_FAILURE);}
         }
         if(option==2)
         {
             gestiune<locuinta> x;
             cin>>x;
             //x.afis_vect(x);
-
+            cout<<"____________________________________________________"<<endl<<endl;
             cout<<x;
             cout<<endl;
             //delete &x;
@@ -677,14 +656,17 @@ void menu()
         {
             gestiune <apartament>x;
             cin>>x;
+             cout<<"____________________________________________________"<<endl<<endl;
             cout<<x;
             cout<<endl;
 
         }
         if(option==4)
         {
-            gestiune<casa> x;
+            gestiune <casa> x;
             cin>>x;
+           // x.afis_case();
+            cout<<"____________________________________________________"<<endl<<endl;
             cout<<x;
             cout<<endl;
         }
@@ -724,12 +706,13 @@ void menu()
                 cout<<endl;
             }
             int cont = 0;
+             cout<<"____________________________________________________"<<endl<<endl;
             for(auto it = pair_array.begin() ; it != pair_array.end(); ++it)
             {
                 cont ++;
 
                 cout<<"Locuinta "<<cont<<" este de tipul: "<<it->second;
-                cout << *(it -> first) << endl ;//<< it -> second << endl;
+                cout << *(it -> first) << endl <<endl;//<< it -> second << endl;
             }
 
 
@@ -738,10 +721,11 @@ void menu()
         {
             gestiune <apartament> x;
             cin>>x;
-            x.get_index();
+            //x.get_index();
             gestiune<apartament> ap;
             cin>>ap;
             x+=ap;
+             cout<<"____________________________________________________"<<endl<<endl;
             x.get_index();
             cout<<x;
             cout<<endl;
@@ -775,5 +759,6 @@ void menu()
 int main()
 {
     menu();
+
     return 0;
 }
