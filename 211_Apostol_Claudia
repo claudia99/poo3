@@ -320,10 +320,15 @@ public:
 
         nretaje=nretaje1;
         double aux;
+        cout<<"   Atentie: suma suprafetelor etajelor trebuie sa fie egala cu suprafata locuintei!"<<endl;
+        double sum=0;
         if(nretaje==0)
             {cout<<"Etajul 0 are suprafata: ";
-            in>>aux;
-            etaj.push_back(aux);
+            in>>aux;sum+=aux;
+
+            if(sum>supraf)
+                {cout<<"Suma suprafetelor etajelor trebuie sa fie egala cu suprafata locuintei"<<endl;exit(EXIT_FAILURE);}
+                etaj.push_back(aux);
             }
         else
         {for(int i=0;i<=nretaje;i++)
@@ -333,9 +338,14 @@ public:
             ///???
             cout<<"Etajul "<<i<<" are suprafata: ";
             in>>aux;
+            sum+=aux;
+            if(sum>supraf)
+                {cout<<"Suma suprafetelor etajelor trebuie sa fie egala cu suprafata locuintei"<<endl;exit(EXIT_FAILURE);}
             etaj.push_back(aux);
 
         }
+        if(sum!=supraf)
+                {cout<<"Suma suprafetelor etajelor trebuie sa fie egala cu suprafata locuintei"<<endl;exit(EXIT_FAILURE);}
         }
         cout<<"Introduceti pretul pentru metrul patrat de curte: ";
         in>>pret;
