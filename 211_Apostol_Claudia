@@ -19,10 +19,6 @@ public:
     {
         cout<<"S-au creat "<<nrloc<<" locuinte"<<endl;
     }
-    int ret_nrloc()
-    {
-        return nrloc;
-    }
     locuinta(string nume="",double s=0,double di=0)
     {
         numeclient=nume;
@@ -271,7 +267,7 @@ public:
     }
     ~casa()
     {
-
+        //delete &etaj;
     }
     casa(const casa &c):locuinta(c)
     {
@@ -333,9 +329,6 @@ public:
         else
         {for(int i=0;i<=nretaje;i++)
         {
-            ///0 etaje = doar parter
-            /// sau 1 etaj = doar parter
-            ///???
             cout<<"Etajul "<<i<<" are suprafata: ";
             in>>aux;
             sum+=aux;
@@ -347,8 +340,17 @@ public:
         if(sum!=supraf)
                 {cout<<"Suma suprafetelor etajelor trebuie sa fie egala cu suprafata locuintei"<<endl;exit(EXIT_FAILURE);}
         }
-        cout<<"Introduceti pretul pentru metrul patrat de curte: ";
-        in>>pret;
+        cout<<"Introduceti pretul pentru metrul patrat : ";
+        double pret1;
+        in>>pret1;
+        try
+        {
+            if(pret1<0)
+                {throw pret1;}
+        }
+        catch(double x)
+            {cout<<"Pretul trebuie sa fie pozitiv"<<endl; exit(EXIT_FAILURE);}
+        pret=pret1;
 
     }
     void afisare(ostream& out)
@@ -438,7 +440,8 @@ public:
         {
             vect=new T[n];
             for(int i=0; i<n; i++)
-                vect[i]=v[i];
+                {vect[i]=v[i];  ve.push_back(v[i]);
+                }
         }
     }
     gestiune(gestiune &g)
