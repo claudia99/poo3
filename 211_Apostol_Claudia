@@ -528,6 +528,7 @@ template <class T> int gestiune <T> ::index=0;
 template<>class gestiune<casa>
 {
     casa* cas;
+    double *chirie;
    // vector <casa> pls;
     int nrcase;
     double profit;
@@ -538,10 +539,12 @@ public:
         profit=0;
        // pls=p;
         cas=new casa[nrcase];
+        chirie=new double[nrcase];
         if(nrcase>0)
         for(int i=0; i<nrcase; i++)
         {
             cas[i]=a[i];
+            chirie[i]=a[i].chirie(a[i]);
            // pls.push_back(a[i]);
             profit+=cas[i].chirie(cas[i]);
         }
@@ -555,6 +558,7 @@ public:
     ~gestiune()
     {
         delete [] cas;
+        delete [] chirie;
     }
     gestiune(const gestiune &s)
     {
@@ -569,6 +573,7 @@ public:
         cout<<"Introduceti numarul de case: ";
         in>>cg.nrcase;
         cg.cas=new casa[cg.nrcase];
+        cg.chirie=new double[cg.nrcase];
         for(int i=0; i<cg.nrcase; i++)
         {
             cout<<"Casa "<<i+1<<":"<<endl;
@@ -576,10 +581,17 @@ public:
             getline(in,buf);
             in>>cg.cas[i];
             //cg.pls.push_back(cg.cas[i]);
+            cg.chirie[i]=cg.cas[i].chirie(cg.cas[i]);
             cg.profit+=cg.cas[i].chirie(cg.cas[i]);
             cout<<endl;
         }
         return in;
+    }
+    void afis_chirii()
+    {
+        for(int i=0;i<nrcase;i++)
+            cout<<chirie[i]<<"  ";
+        cout<<endl;
     }
     friend ostream& operator<<(ostream& out,gestiune<casa> &cg)
     {
@@ -680,6 +692,7 @@ void menu()
             cin>>x;
            // x.afis_case();
             cout<<"____________________________________________________"<<endl<<endl;
+            //x.afis_chirii();
             cout<<x;
             cout<<endl;
         }
